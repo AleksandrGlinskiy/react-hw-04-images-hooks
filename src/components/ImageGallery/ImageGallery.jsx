@@ -92,7 +92,7 @@ export class ImageGallery extends Component {
   }
 }
 
-ImageGallery.propTypes = {
-  searchText: PropTypes.string.isRequired,
-  currentPage: PropTypes.number,
-};
+// ImageGallery.propTypes = {
+//   searchText: PropTypes.string.isRequired,
+//   currentPage: PropTypes.number,
+// };

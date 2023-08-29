@@ -6,12 +6,12 @@ import { Searchbar } from './Searchbar/Searchbar';
 export function App () {
   
   const [searchText, setSearchText] = useState('');
-  const [currentPage, setCurrentPage] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
   
  
 
   const handleSearchbar = searchText => {
-    setSearchText({ searchText });
+    setSearchText(searchText);
   };
 
   
