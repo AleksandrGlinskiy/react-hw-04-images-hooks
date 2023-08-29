@@ -1,10 +1,11 @@
 import { ImageGalleryItem } from './ImageGalleryItem';
 import css from './ImageGallery.module.css';
-import { Component } from 'react';
+
 import { getImages } from '../../services/api';
 import { Loader } from 'components/Loader/Loader';
 import { Button } from 'components/Button/Button';
 import PropTypes from 'prop-types';
+import { useEffect, useState, useRef } from 'react';
 
 const STATUS = {
   IDLE: 'idle',
@@ -13,7 +14,68 @@ const STATUS = {
   REJECTED: 'rejected',
 };
 
-export class ImageGallery extends Component {
+export function ImageGallery({ searchText, queryCurrentPage}) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [galleryItems, setGalleryItems] = useState([]);
+  const [status, setStatus] = useState(STATUS.IDLE);
+  const [error, setError] = useState(null);
+  const isFirstRender = useRef(true);
+
+  const fetchMoreImages = () => {
+    setStatus(STATUS.PENDING);
+
+    getImages(searchText, currentPage)
+      .then(data => {
+        console.log(data);
+        if (data.hits.length === 0) {
+          setStatus(STATUS.REJECTED);
+        } else {
+          setGalleryItems([...galleryItems, ...data.hits]);
+          setStatus(STATUS.RESOLVED);
+          setCurrentPage(currentPage + 1);
+        }
+      })
+      .catch(error => {
+        setError(error);
+        setStatus(STATUS.REJECTED);
+      });
+    };
+
+    useEffect(() => {
+      if (isFirstRender.current) {
+        isFirstRender.current = false;
+        return;
+      }
+      setStatus(STATUS.PENDING);
+      setGalleryItems([]);
+      setCurrentPage(queryCurrentPage);
+      fetchMoreImages();
+    }, [queryCurrentPage]);
+
+    if (status === STATUS.IDLE) {
+      return <h1>Please enter text</h1>;
+    }
+
+    if (status === STATUS.REJECTED) {
+      console.log(error);
+      return error ? <div>{error.message}</div> : <h2>not found image</h2>;
+    }
+
+    return (
+      <>
+        <ul className={css.ImageGallery}>
+          {galleryItems.map(el => {
+            return <ImageGalleryItem key={el.id} el={el} tags={el.tags} />;
+          })}
+        </ul>
+        {status === STATUS.PENDING && <Loader />}
+        {status === STATUS.RESOLVED && <Button onClick={fetchMoreImages} />}
+      </>
+    );
+  };
+
+
+/* export class ImageGallery extends Component {
   state = {
     currentPage: 1,
     galleryItems: [],
@@ -56,27 +118,27 @@ export class ImageGallery extends Component {
     const { galleryItems, status, error } = this.state;
     if (status === STATUS.IDLE) {
       return <h1>Please enter text</h1>;
-    }
-    // if (status === STATUS.PENDING) {
-    //   return <Loader />;
-    // }
+    } */
+// if (status === STATUS.PENDING) {
+//   return <Loader />;
+// }
 
-    if (status === STATUS.REJECTED) {
+/*     if (status === STATUS.REJECTED) {
       console.log(error);
       return error ? <div>{error.message}</div> : <h2>not found image</h2>;
-    }
+    } */
 
-    // if(status === STATUS.RESOLVED) {
-    //   return <>
-    //   <ul className={css.ImageGallery}>
-    //   {galleryItems.map(el => {
-    //     return <ImageGalleryItem key={el.id} el={el} tags={el.tags} />;
-    //   })}
+// if(status === STATUS.RESOLVED) {
+//   return <>
+//   <ul className={css.ImageGallery}>
+//   {galleryItems.map(el => {
+//     return <ImageGalleryItem key={el.id} el={el} tags={el.tags} />;
+//   })}
 
-    // </ul>
-    // 
-    // }
-    return (
+// </ul>
+//
+// }
+/*   return (
       <>
         
         <ul className={css.ImageGallery}>
@@ -90,7 +152,7 @@ export class ImageGallery extends Component {
       </>
     );
   }
-}
+} */
 
 // ImageGallery.propTypes = {
 //   searchText: PropTypes.string.isRequired,

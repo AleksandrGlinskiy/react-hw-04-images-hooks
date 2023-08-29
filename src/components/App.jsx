@@ -6,7 +6,7 @@ import { Searchbar } from './Searchbar/Searchbar';
 export function App () {
   
   const [searchText, setSearchText] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [queryCurrentPage, setQueryCurrentPage] = useState(1);
   
  
 
@@ -18,7 +18,7 @@ export function App () {
     return (
       <div className={css.App}>
         <Searchbar onSubmit={handleSearchbar} />
-        <ImageGallery searchText={searchText} currentPage={currentPage} />
+        <ImageGallery searchText={searchText} queryCurrentPage={queryCurrentPage} />
       </div>
     );
   }
